@@ -1,0 +1,71 @@
+{
+  "_comment": "Minimal Pterodactyl egg for DerenguhGram-Proxy. Import via Admin -> Nests -> Import Egg. Python generic docker image, no root, 128MB-friendly.",
+  "meta": { "version": "PTDL_v2", "update_url": null },
+  "name": "DerenguhGram Proxy",
+  "author": "derenguh@example.org",
+  "description": "Fake-TLS compressing MTProto transport proxy (DerenguhProto). Runs without root, port from SERVER_PORT.",
+  "features": null,
+  "docker_images": { "Python 3.12": "ghcr.io/pterodactyl/yolks:python_3.12" },
+  "file_denylist": [],
+  "startup": "python3 -m derenguh_proxy",
+  "config": {
+    "files": "{}",
+    "startup": "{\n    \"done\": \"started successfully\"\n}",
+    "logs": "{}",
+    "stop": "^C"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/bash\napt-get update -qq && apt-get install -y -qq git python3-pip\ncd /mnt/server\ngit clone ${GIT_REPO} src || (cd src && git pull)\ncp -r src/DerenguhGram-Proxy/derenguh_proxy ./\nif [ -f src/DerenguhGram-Proxy/requirements.txt ]; then pip install --no-cache-dir -r src/DerenguhGram-Proxy/requirements.txt; fi\necho 'Installation complete.'",
+      "container": "python:3.12-slim",
+      "entrypoint": "bash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Public Host",
+      "description": "IP or domain shown in the connection link.",
+      "env_variable": "DERENGUH_PUBLIC_HOST",
+      "default_value": "your.server.host",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    },
+    {
+      "name": "Proxy Secret (hex)",
+      "description": "32-char hex (16 bytes). Leave empty to auto-generate (changes on restart).",
+      "env_variable": "DERENGUH_SECRET",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string|max:64"
+    },
+    {
+      "name": "Default SNI",
+      "description": "Streaming host used in the link and as the splice fallback.",
+      "env_variable": "DERENGUH_SNI",
+      "default_value": "music.yandex.ru",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    },
+    {
+      "name": "Codec",
+      "description": "Preferred compression codec: none, zlib, brotli.",
+      "env_variable": "DERENGUH_CODEC",
+      "default_value": "zlib",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|in:none,zlib,brotli"
+    },
+    {
+      "name": "Git Repository",
+      "description": "Repository containing DerenguhGram-Proxy.",
+      "env_variable": "GIT_REPO",
+      "default_value": "https://github.com/yourname/DerenguhGram-Proxy.git",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string"
+    }
+  ]
+}

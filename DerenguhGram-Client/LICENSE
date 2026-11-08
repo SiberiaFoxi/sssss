@@ -1,0 +1,17 @@
+DerenguhGram-Client licensing
+
+This repository contains additive modules for two upstream projects with different
+licenses. Each module inherits the license of the upstream it integrates into:
+
+* desktop/  — GNU GPL v3 (inherited from telegramdesktop/tdesktop).
+              SPDX-License-Identifier: GPL-3.0-only
+* android/  — GNU GPL v2 or later (inherited from DrKLO/Telegram).
+              SPDX-License-Identifier: GPL-2.0-or-later
+
+When you distribute a built fork, you must comply with the corresponding upstream
+license and publish your source code. Do not use the Telegram name or logo in a way
+that implies official endorsement; make clear that DerenguhGram is unofficial.
+
+Full license texts:
+  GPLv3: https://www.gnu.org/licenses/gpl-3.0.txt
+  GPLv2: https://www.gnu.org/licenses/gpl-2.0.txt

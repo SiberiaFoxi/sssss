@@ -1,0 +1,66 @@
+{
+  "secret_hex": "00112233445566778899aabbccddeeff",
+  "secret_key": "ABEiM0RVZneImaq7zN3u_w",
+  "link": "derenguh://proxy?server=proxy.example.org&port=3183&sni=music.yandex.ru&key=ABEiM0RVZneImaq7zN3u_w",
+  "client_hello": {
+    "sni": "music.yandex.ru",
+    "session_id_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+    "timestamp": 1700000000,
+    "record_b64": "FgMBAgABAAH8AwNKGptifD+YCnXcTBSf/d/Q4RUB98tbiq0+s7Q1D17NDCAAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHwAQEwETAhMDwCvAL8AswDAA/wEAAaMAAAAUABIAAA9tdXNpYy55YW5kZXgucnUAKwADAgMEAAoACAAGAB0AFwAYADMAJgAkAB0AIESRiUo0oIUBzZC4NQs7b1Z0WSVnwXP4q/e6/JbRVwJ0AA0ACgAIBAMFAwYDCAQACwACAQAAEAAOAAwCaDIIaHR0cC8xLjEALQACAQEAIwAAABUBGgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+    "digest_b64": "ShqbYnw/mAp13EwUn/3f0OEVAffLW4qtPrO0NQ9ezQw=",
+    "record_len": 517
+  },
+  "control_frames": [
+    {
+      "codec": 0,
+      "dc_index": 1,
+      "b64": "REcBAAEAAAA="
+    },
+    {
+      "codec": 0,
+      "dc_index": 2,
+      "b64": "REcBAAIAAAA="
+    },
+    {
+      "codec": 0,
+      "dc_index": 5,
+      "b64": "REcBAAUAAAA="
+    },
+    {
+      "codec": 1,
+      "dc_index": 1,
+      "b64": "REcBAQEAAAA="
+    },
+    {
+      "codec": 1,
+      "dc_index": 2,
+      "b64": "REcBAQIAAAA="
+    },
+    {
+      "codec": 1,
+      "dc_index": 5,
+      "b64": "REcBAQUAAAA="
+    },
+    {
+      "codec": 2,
+      "dc_index": 1,
+      "b64": "REcBAgEAAAA="
+    },
+    {
+      "codec": 2,
+      "dc_index": 2,
+      "b64": "REcBAgIAAAA="
+    },
+    {
+      "codec": 2,
+      "dc_index": 5,
+      "b64": "REcBAgUAAAA="
+    }
+  ],
+  "server_ack_ok_zlib": "REcBAQAAAAA=",
+  "zlib_decompress_vector": {
+    "comment": "Decode block_b64 with a standard inflater; must equal plain_b64.",
+    "block_b64": "SIlySS1KzUsvzQgoyi/JV8jMK0ktyi9QKEtNLskvUnAZlRyVHJUclaS9JAAAAP//",
+    "plain_b64": "RGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciBEZXJlbmd1aFByb3RvIGludGVyb3AgdmVjdG9yIERlcmVuZ3VoUHJvdG8gaW50ZXJvcCB2ZWN0b3IgRGVyZW5ndWhQcm90byBpbnRlcm9wIHZlY3RvciA="
+  }
+}
