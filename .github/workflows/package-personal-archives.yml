@@ -1,0 +1,57 @@
+name: Package personal archives
+
+on:
+  push:
+    branches: [arena/4c022900-sssss]
+    paths:
+      - 'scripts/package_personal_archives.py'
+      - '.github/workflows/package-personal-archives.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build personal/public-demo archives
+        run: python3 scripts/package_personal_archives.py --out delivery
+
+      - name: Upload archives to draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=personal-2026-11-08
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --draft \
+              --target "$GITHUB_SHA" \
+              --title "DerenguhGram — личные архивы (public demo values)" \
+              --notes-file delivery/RELEASE-NOTES.ru.md
+          fi
+          gh release upload "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --clobber \
+            delivery/DerenguhGram-Proxy-personal.zip \
+            delivery/DerenguhGram-Android-personal.zip \
+            delivery/DerenguhGram-Desktop-personal.zip \
+            delivery/SHA256SUMS.txt
+
+      - name: Show release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view personal-2026-11-08 \
+            --repo "$GITHUB_REPOSITORY" \
+            --json url,isDraft,assets \
+            --jq '{url: .url, draft: .isDraft, assets: [.assets[] | {name: .name, size: .size}]}'
