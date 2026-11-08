@@ -1,0 +1,4 @@
+{
+  "android": {"repo": "DrKLO/Telegram", "commit": "7be672ead283d022812d75c729d3a04dd4c2a2c6", "version": "13.2.1"},
+  "desktop": {"repo": "telegramdesktop/tdesktop", "commit": "7381fb1df75d863eb3463fdddef57a2ac51f1d56", "version": "7.4.1"}
+}

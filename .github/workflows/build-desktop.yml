@@ -1,0 +1,111 @@
+name: Build Windows Desktop EXE
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'integrations/desktop/**'
+      - 'scripts/integrate_desktop.py'
+      - '.github/workflows/build-desktop.yml'
+permissions:
+  contents: write
+jobs:
+  win:
+    runs-on: windows-latest
+    timeout-minutes: 350
+    defaults:
+      run:
+        shell: cmd
+    env:
+      DESKTOP_COMMIT: 7381fb1df75d863eb3463fdddef57a2ac51f1d56
+      SDK: 10.0.26100.0
+      TBUILD: ${{ github.workspace }}\TBuild
+      LibrariesPath: ${{ github.workspace }}\TBuild\Libraries\win64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: overlay
+      - name: Prepare directories
+        run: |
+          mkdir %TBUILD%\Libraries
+          mkdir %TBUILD%\ThirdParty
+      - name: Clone pinned tdesktop (recursive)
+        shell: bash
+        run: |
+          git clone https://github.com/telegramdesktop/tdesktop.git "$TBUILD/tdesktop"
+          cd "$TBUILD/tdesktop"
+          git checkout "$DESKTOP_COMMIT"
+          git submodule update --init --recursive --depth 1
+      - name: Integrate DerenguhGram
+        shell: bash
+        run: python3 overlay/scripts/integrate_desktop.py "$TBUILD/tdesktop"
+      - name: Cache key
+        shell: bash
+        run: |
+          KEY=$(sha256sum "$TBUILD/tdesktop/Telegram/build/prepare/prepare.py" | awk '{print $1}')
+          echo "CACHE_KEY=$KEY" >> $GITHUB_ENV
+      - uses: Eden-CI/msvc-dev-cmd@master
+        with:
+          arch: x64
+          sdk: ${{ env.SDK }}
+          toolset: '14.44'
+      - name: ThirdParty cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.TBUILD }}\ThirdParty
+          key: win-x64-thirdparty-${{ env.CACHE_KEY }}
+      - name: Libraries cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.LibrariesPath }}\*
+            !${{ env.LibrariesPath }}\cache_keys
+            !${{ env.LibrariesPath }}\[qQ]t[_-]*
+            ${{ env.LibrariesPath }}\cache_keys\*
+            !${{ env.LibrariesPath }}\cache_keys\[qQ]t[_-]*
+          key: win-x64-libs-${{ env.CACHE_KEY }}
+      - name: Qt cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.LibrariesPath }}\[qQ]t[_-]*
+            ${{ env.LibrariesPath }}\cache_keys\[qQ]t[_-]*
+          key: win-x64-qt6-${{ env.CACHE_KEY }}
+      - name: Prepare libraries (official recipe)
+        run: |
+          %TBUILD%\tdesktop\Telegram\build\prepare\win.bat skip-release silent qt6
+      - name: Free disk space
+        shell: bash
+        run: find "$LibrariesPath" '(' '(' ! '(' -name '*.lib' -o -name '*.a' -o -name '*.exe' -o -name '*.h' -o -name '*.hpp' -o -name '*.inc' -o -name '*.cmake' -o -name '*.pc' -o -path '*/include/*' -o -path '*/objects-*' -o -path '*/cache_keys/*' -o -path '*/patches/*' -o -path '*/nv-codec-headers/*' ')' -type f ')' -o -empty ')' -delete
+      - name: Configure + build Release
+        run: |
+          cd %TBUILD%\tdesktop\Telegram
+          call configure.bat x64 -G "Ninja Multi-Config" qt6 -D TDESKTOP_API_ID=611335 -D TDESKTOP_API_HASH=d524b414d21f4d37f08684c1df41ac9c -D CMAKE_CONFIGURATION_TYPES=Release -D CMAKE_COMPILE_WARNING_AS_ERROR=OFF -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
+          cmake --build ..\out --config Release --parallel 2
+      - name: Package EXE
+        shell: bash
+        run: |
+          set -e
+          mkdir -p dist
+          cp "$TBUILD/tdesktop/out/Release/Telegram.exe" dist/DerenguhGram-Desktop-7.4.1-win64.exe
+          if [ -f "$TBUILD/tdesktop/out/Release/Updater.exe" ]; then cp "$TBUILD/tdesktop/out/Release/Updater.exe" dist/Updater.exe; fi
+          cd dist && sha256sum *.exe > SHA256SUMS-desktop.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DerenguhGram-Desktop-win64
+          path: dist/
+          retention-days: 14
+      - name: Upload to draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload clients-v0.1.0 dist/* --clobber --repo "$GITHUB_REPOSITORY"
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-build-logs
+          path: |
+            ${{ env.TBUILD }}\tdesktop\out\CMakeFiles\*.log
+            ${{ env.TBUILD }}\tdesktop\out\build.ninja
+          retention-days: 7

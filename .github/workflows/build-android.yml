@@ -1,0 +1,75 @@
+name: Build Android release APK
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'integrations/android/**'
+      - 'scripts/integrate_android.py'
+      - 'scripts/prepare_android_ci.py'
+      - '.github/workflows/build-android.yml'
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    env:
+      ANDROID_COMMIT: 7be672ead283d022812d75c729d3a04dd4c2a2c6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install NDK / CMake
+        run: |
+          sdkmanager --install "ndk;27.2.12479018" "cmake;3.22.1" "build-tools;36.0.0" "platforms;android-36"
+      - name: Fetch pinned Telegram Android (with submodules)
+        run: |
+          git clone https://github.com/DrKLO/Telegram.git upstream
+          cd upstream
+          git checkout "$ANDROID_COMMIT"
+          git submodule update --init --recursive --depth 1
+      - name: Integrate DerenguhGram
+        run: |
+          python3 scripts/integrate_android.py upstream
+          python3 scripts/prepare_android_ci.py upstream
+      - name: Unit tests (protocol interop)
+        run: |
+          cd upstream
+          chmod +x gradlew
+          ./gradlew :TMessagesProj:testReleaseUnitTest --tests org.derenguhgram.DerenguhInteropTest --no-daemon --stacktrace
+      - name: Build release APK (afat, signed with upstream demo keystore)
+        run: |
+          cd upstream
+          ./gradlew :TMessagesProj_App:assembleAfatRelease --no-daemon --stacktrace
+      - name: Verify + rename APK
+        run: |
+          set -e
+          APK=$(find upstream/TMessagesProj_App/build/outputs/apk/afat/release -name '*.apk' | head -1)
+          test -n "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$APK"
+          mkdir -p dist
+          cp "$APK" dist/DerenguhGram-Android-13.2.1-release.apk
+          sha256sum dist/*.apk > dist/SHA256SUMS-android.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DerenguhGram-Android-release
+          path: dist/
+          retention-days: 14
+      - name: Upload to draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload clients-v0.1.0 dist/DerenguhGram-Android-13.2.1-release.apk dist/SHA256SUMS-android.txt --clobber --repo "$GITHUB_REPOSITORY"
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-logs
+          path: |
+            upstream/TMessagesProj/build/reports/**
+            upstream/TMessagesProj_App/build/reports/**
+            upstream/.gradle/**
+          retention-days: 7
