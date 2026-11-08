@@ -6,9 +6,9 @@ import argparse, subprocess, sys, shutil
 ROOT=Path(__file__).resolve().parents[1]
 
 def patch(path, old, new, count=1):
-    p=Path(path); s=p.read_text()
+    p=Path(path); s=p.read_text(encoding="utf-8")
     if s.count(old)!=count: raise SystemExit(f'anchor mismatch in {p} ({s.count(old)}!={count}): {old[:120]!r}')
-    p.write_text(s.replace(old,new))
+    p.write_text(encoding="utf-8",data=s.replace(old,new))
 
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument('target',type=Path); a=ap.parse_args(); t=a.target
@@ -162,13 +162,22 @@ def main():
         if (org.derenguhgram.privacy.PrivacyController.INSTANCE.getNoReadReceipts()) return;''')
     patch(p,'''    public void markMentionsAsRead(long dialogId, long topicId) {''','''    public void markMentionsAsRead(long dialogId, long topicId) {
         if (org.derenguhgram.privacy.PrivacyController.INSTANCE.getNoReadReceipts()) return;''')
-    s=p.read_text(); idx=s.index('public boolean sendTyping(long dialogId, long threadMsgId, int action, String emojicon, int classGuid)'); brace=s.index('{',idx)
+    s=p.read_text(encoding="utf-8"); idx=s.index('public boolean sendTyping(long dialogId, long threadMsgId, int action, String emojicon, int classGuid)'); brace=s.index('{',idx)
     s=s[:brace+1]+'\n        if (org.derenguhgram.privacy.PrivacyController.INSTANCE.getNoTyping()) return false;'+s[brace+1:]
     s=s.replace('''                        req.offline = false;''','''                        req.offline = org.derenguhgram.privacy.PrivacyController.INSTANCE.getInvisible();''')
-    p.write_text(s)
+    p.write_text(encoding="utf-8",data=s)
     # Kotlin + tests + fork safety
     p=t/'TMessagesProj/build.gradle'
     patch(p,"apply plugin: 'com.android.library'","apply plugin: 'com.android.library'\napply plugin: 'org.jetbrains.kotlin.android'")
+    patch(p,'''    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8''','''    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8''')
     patch(p,'''    lintOptions {''','''    testOptions {
         unitTests.returnDefaultValues = true
     }
@@ -183,9 +192,9 @@ def main():
     shutil.copy2(ROOT/'DerenguhGram-Client/android/src/test/java/org/derenguhgram/DerenguhInteropTest.kt',tr/'DerenguhInteropTest.kt')
     res=t/'TMessagesProj/src/test/resources'; res.mkdir(parents=True,exist_ok=True)
     shutil.copy2(ROOT/'DerenguhGram-Client/shared/test_vectors.json',res/'test_vectors.json')
-    tp=tr/'DerenguhInteropTest.kt'; s=tp.read_text().replace('val text = File("../shared/test_vectors.json").readText()','val text = javaClass.getResourceAsStream("/test_vectors.json")!!.bufferedReader().use { it.readText() }'); tp.write_text(s)
+    tp=tr/'DerenguhInteropTest.kt'; s=tp.read_text(encoding="utf-8").replace('val text = File("../shared/test_vectors.json").readText()','val text = javaClass.getResourceAsStream("/test_vectors.json")!!.bufferedReader().use { it.readText() }'); tp.write_text(encoding="utf-8",data=s)
     # Fragment uses builder API
-    fp=j/'org/telegram/ui/DerenguhGramFragment.java'; s=fp.read_text().replace('ProxySettings ps=new ProxySettings(ProxySettings.Type.DERENGUH,h,po,s,"",k);','ProxySettings ps=ProxySettings.builder().setType(ProxySettings.Type.DERENGUH).setAddress(h).setPort(po).setUser(s).setSecret(k).build();'); fp.write_text(s)
+    fp=j/'org/telegram/ui/DerenguhGramFragment.java'; s=fp.read_text(encoding="utf-8").replace('ProxySettings ps=new ProxySettings(ProxySettings.Type.DERENGUH,h,po,s,"",k);','ProxySettings ps=ProxySettings.builder().setType(ProxySettings.Type.DERENGUH).setAddress(h).setPort(po).setUser(s).setSecret(k).build();'); fp.write_text(encoding="utf-8",data=s)
     # App module: personal applicationId, readable release (no R8 stripping of reflection-heavy Telegram), demo signing already upstream.
     app=t/'TMessagesProj_App/build.gradle'
     patch(app,'defaultConfig.applicationId = APP_PACKAGE','defaultConfig.applicationId = "org.derenguhgram.personal"')

@@ -4,9 +4,9 @@ from pathlib import Path
 import argparse, subprocess, sys
 ROOT=Path(__file__).resolve().parents[1]
 def patch(path, old, new, count=1):
-    p=Path(path); s=p.read_text()
+    p=Path(path); s=p.read_text(encoding="utf-8")
     if s.count(old)!=count: raise SystemExit(f'anchor mismatch in {p} ({s.count(old)}!={count}): {old[:120]!r}')
-    p.write_text(s.replace(old,new))
+    p.write_text(encoding="utf-8",data=s.replace(old,new))
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument('target',type=Path); a=ap.parse_args(); t=a.target
     subprocess.run([sys.executable,str(ROOT/'scripts/apply_overlay.py'),str(ROOT/'integrations/desktop'),str(t/'Telegram/SourceFiles')],check=True)
