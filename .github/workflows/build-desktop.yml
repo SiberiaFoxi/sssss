@@ -90,8 +90,8 @@ jobs:
       - name: Configure + build Release
         run: |
           cd %TBUILD%\tdesktop\Telegram
-          call configure.bat x64 -G "Ninja Multi-Config" qt6 -D TDESKTOP_API_ID=611335 -D TDESKTOP_API_HASH=d524b414d21f4d37f08684c1df41ac9c -D CMAKE_CONFIGURATION_TYPES=Release -D CMAKE_COMPILE_WARNING_AS_ERROR=OFF -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
-          cmake --build ..\out --config Release --parallel 2
+          call configure.bat x64 -G "Ninja Multi-Config" qt6 -D TDESKTOP_API_ID=611335 -D TDESKTOP_API_HASH=d524b414d21f4d37f08684c1df41ac9c -D CMAKE_CONFIGURATION_TYPES=Release -D CMAKE_COMPILE_WARNING_AS_ERROR=OFF -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON > ..\..\desktop-build.log 2>&1
+          cmake --build ..\out --config Release --parallel 2 > ..\..\desktop-build.log 2>&1
       - name: Package EXE
         shell: bash
         run: |
@@ -111,12 +111,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release upload clients-v0.1.0 dist/* --clobber --repo "$GITHUB_REPOSITORY"
-      - name: Upload logs on failure
+      - name: Post build log as commit comment
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-build-logs
-          path: |
-            ${{ env.TBUILD }}\tdesktop\out\CMakeFiles\*.log
-            ${{ env.TBUILD }}\tdesktop\out\build.ninja
-          retention-days: 7
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY=$(tail -c 60000 desktop-build.log 2>/dev/null || echo "no build log")
+          jq -n --arg body "$BODY" '{body: $body}' > /tmp/comment.json
+          gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments" --input /tmp/comment.json || true
