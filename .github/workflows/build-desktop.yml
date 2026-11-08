@@ -37,7 +37,16 @@ jobs:
           git submodule update --init --recursive --depth 1
       - name: Integrate DerenguhGram
         shell: bash
-        run: python3 overlay/scripts/integrate_desktop.py "$TBUILD/tdesktop"
+        run: |
+          set -o pipefail
+          python3 overlay/scripts/integrate_desktop.py "$TBUILD/tdesktop" 2>&1 | tee integrate-desktop.log
+      - name: Upload integration log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-integration-log
+          path: integrate-desktop.log
+          retention-days: 7
       - name: Cache key
         shell: bash
         run: |
