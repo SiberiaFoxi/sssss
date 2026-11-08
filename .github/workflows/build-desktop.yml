@@ -91,7 +91,7 @@ jobs:
         run: |
           cd %TBUILD%\tdesktop\Telegram
           call configure.bat x64 -G "Ninja Multi-Config" qt6 -D TDESKTOP_API_ID=611335 -D TDESKTOP_API_HASH=d524b414d21f4d37f08684c1df41ac9c -D CMAKE_CONFIGURATION_TYPES=Release -D CMAKE_COMPILE_WARNING_AS_ERROR=OFF -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON > %GITHUB_WORKSPACE%\desktop-build.log 2>&1
-          cmake --build ..\out --config Release --parallel 2 > %GITHUB_WORKSPACE%\desktop-build.log 2>&1
+          cmake --build ..\out --config Release --parallel 2 >> %GITHUB_WORKSPACE%\desktop-build.log 2>&1
       - name: Package EXE
         shell: bash
         run: |
