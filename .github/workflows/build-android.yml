@@ -42,11 +42,13 @@ jobs:
         run: |
           cd upstream
           chmod +x gradlew
-          ./gradlew :TMessagesProj:testReleaseUnitTest --tests org.derenguhgram.DerenguhInteropTest --no-daemon --stacktrace
+          set -o pipefail
+          ./gradlew :TMessagesProj:testReleaseUnitTest --tests org.derenguhgram.DerenguhInteropTest --no-daemon --stacktrace 2>&1 | tee ../android-test.log
       - name: Build release APK (afat, signed with upstream demo keystore)
         run: |
           cd upstream
-          ./gradlew :TMessagesProj_App:assembleAfatRelease --no-daemon --stacktrace
+          set -o pipefail
+          ./gradlew :TMessagesProj_App:assembleAfatRelease --no-daemon --stacktrace 2>&1 | tee ../android-build.log
       - name: Verify + rename APK
         run: |
           set -e
@@ -66,13 +68,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release upload clients-v0.1.0 dist/DerenguhGram-Android-13.2.1-release.apk dist/SHA256SUMS-android.txt --clobber --repo "$GITHUB_REPOSITORY"
-      - name: Upload build logs on failure
+      - name: Post build log as commit comment
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-build-logs
-          path: |
-            upstream/TMessagesProj/build/reports/**
-            upstream/TMessagesProj_App/build/reports/**
-            upstream/.gradle/**
-          retention-days: 7
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY=$( (tail -c 30000 android-test.log 2>/dev/null; echo; tail -c 30000 android-build.log 2>/dev/null) | tail -c 60000)
+          jq -n --arg body "$BODY" '{body: $body}' > /tmp/comment.json
+          gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments" --input /tmp/comment.json || true

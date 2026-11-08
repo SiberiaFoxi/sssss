@@ -40,13 +40,15 @@ jobs:
         run: |
           set -o pipefail
           python3 overlay/scripts/integrate_desktop.py "$TBUILD/tdesktop" 2>&1 | tee integrate-desktop.log
-      - name: Upload integration log
+      - name: Post integration log as commit comment
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-integration-log
-          path: integrate-desktop.log
-          retention-days: 7
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY=$(tail -c 60000 integrate-desktop.log 2>/dev/null || echo "no log")
+          jq -n --arg body "$BODY" '{body: $body}' > /tmp/comment.json
+          gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments" --input /tmp/comment.json || true
       - name: Cache key
         shell: bash
         run: |
