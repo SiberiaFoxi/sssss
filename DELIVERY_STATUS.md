@@ -1,43 +1,23 @@
-# Что действительно передаётся
+# DerenguhGram delivery status
 
-## Таблица файлов
+## Delivered
+- Source/config archives (not installers): draft release `personal-2026-11-08`
+  https://github.com/SiberiaFoxi/sssss/releases/tag/untagged-8596401ecb38dd58b5b5
+- DerenguhGram-Proxy Python server: 23 tests passing, 200-conn demo RSS ~72.8 MB.
 
-| Пакет | Содержимое | Можно сразу установить/запустить? |
-|---|---|---|
-| `DerenguhGram-Proxy-source.zip` | Исходники Python-сервера, локальные тесты, Dockerfile, пример env и инструкция Pterodactyl | Можно запускать исходники через Python 3.10+; это не скомпилированный серверный EXE |
-| `DerenguhGram-Android-source.zip` | Kotlin-модули, примеры интеграции, тестовые векторы и документация | **Нет. Это не APK и не законченный Android-проект** |
-| `DerenguhGram-Desktop-source.zip` | C++/Qt-модули для Windows, CMakeLists, тестовая обвязка и документация | **Нет. Это не EXE и не полный форк Telegram Desktop** |
+## In progress: real client binaries
+Draft release `clients-v0.1.0`:
+https://github.com/SiberiaFoxi/sssss/releases/tag/untagged-55aeab518cc76b708b10
 
-В этом наборе **нет готовых `DerenguhGram.apk`, `DerenguhGram.exe` или установщика**.
-ZIP-архивы нельзя переименовывать в APK/EXE. Официальный клиент Telegram также не
-подменяется файлом «нашего» клиента.
+CI builds official Telegram sources with the DerenguhGram overlay:
+- Android release APK (afat, signed with upstream demo keystore) — workflow `build-android.yml`.
+- Windows x64 EXE (official tdesktop prepare/configure recipe) — workflow `build-desktop.yml`.
 
-## Проверено
+No APK/EXE is claimed until the corresponding workflow succeeds and `apksigner verify` /
+file inspection passes. Assets are uploaded only from successful build steps.
 
-- Сервер: `python3 -m unittest discover -s tests -v` из каталога `DerenguhGram-Proxy`.
-- Последний локальный прогон: 22 теста пройдены, 1 необязательный тест Brotli пропущен,
-  поскольку пакет `brotli` не установлен.
-- Интеграционные тесты используют локальный echo-сервер вместо Telegram DC и локальный
-  mock-хост вместо настоящего стримингового сервиса.
-
-## Не проверено / не завершено
-
-- Реальное соединение с Telegram DC и авторизация аккаунта через модифицированный клиент.
-- Сборка C++/Qt-модулей и Kotlin-модулей в окружении соответствующих форков.
-- Полная интеграция нового типа прокси, меню ClanSecrets и гейтов приватности в upstream.
-- Подпись APK вашим keystore, установка APK на устройство, запуск и упаковка Windows EXE.
-- Развёртывание в Pterodactyl, ограничения контейнера под нагрузкой и сетевые условия РФ.
-
-В текущем окружении отсутствуют JDK/Gradle/Android SDK/NDK, CMake и Qt/MSVC. Одной
-упаковки исходников недостаточно для получения устанавливаемых клиентов.
-
-## Что потребуется для настоящих установщиков
-
-1. Выбрать и проверить версии полных upstream-форков и их субмодулей.
-2. Завершить интеграцию модулей; исправить ошибки компиляции и проверить протокол на устройствах.
-3. Настроить собственные Telegram API credentials в сборочной конфигурации, не в публичном архиве.
-4. Android: собрать Gradle-проект с SDK/NDK и подписать APK собственным закрытым ключом.
-5. Windows: собрать tdesktop с Qt/зависимостями, проверить запуск и подготовить portable-каталог или установщик.
-6. Проверить лицензии, комплектность исходников и отсутствие секретов перед публикацией.
-
-Инструкции в клиентских архивах — ориентиры для этой работы, не обещание готовой сборки.
+## Scope guardrails
+- Ordinary media/log/cache export only. Protected and self-destructing media is not
+  intercepted; sender privacy choices are respected.
+- Public/demo API credentials and keystore are labelled as such; replace for any public
+  distribution.
