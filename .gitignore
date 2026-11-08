@@ -7,3 +7,6 @@
 *.jks
 __pycache__/
 *.py[cod]
+
+# Generated personal delivery archives (uploaded as release assets, not committed)
+/delivery/
