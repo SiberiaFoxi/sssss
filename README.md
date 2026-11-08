@@ -4,8 +4,10 @@
 
 | Проект | Что это | Статус |
 |---|---|---|
-| [DerenguhGram-Proxy](DerenguhGram-Proxy/) | сервер-прокси (Python, asyncio): Fake-TLS под РФ-стриминг, сжатие, TCP Splice | **реализован и протестирован** (23 теста) |
-| [DerenguhGram-Client](DerenguhGram-Client/) | мод клиента Telegram (C++/Qt + Kotlin): тип прокси DerenguhGram, ClanSecrets, приватность | **готовые к интеграции модули + инструкции по сборке** |
+| [DerenguhGram-Proxy](DerenguhGram-Proxy/) | сервер-прокси (Python, asyncio): Fake-TLS под РФ-стриминг, сжатие, TCP Splice | **исходный прототип; локальные тесты с mock-DC** |
+| [DerenguhGram-Client](DerenguhGram-Client/) | модули для мода Telegram (C++/Qt + Kotlin): прокси DerenguhGram, ClanSecrets, приватность | **исходные модули и черновики инструкций; полные форки и APK/EXE не собраны** |
+
+Состояние передаваемых файлов и ограничения проверки: [DELIVERY_STATUS.md](DELIVERY_STATUS.md).
 
 ## Архитектура
 

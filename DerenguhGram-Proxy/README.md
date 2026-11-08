@@ -8,6 +8,11 @@ brotli) и прозрачно передаёт obfuscated-2 MTProto в дата-
 [alexbers/mtprotoproxy](https://github.com/alexbers/mtprotoproxy) (MIT), поверх добавлен
 собственный протокол **DerenguhProto** (сжатие + явный выбор DC).
 
+> **Статус проверки:** исходный прототип. Локальные тесты используют mock-DC и mock-хост
+> маскировки, а не реальные дата-центры Telegram. Совместимость с полноценным
+> Telegram-клиентом, работа в Pterodactyl и поведение под реальной нагрузкой не
+> подтверждены. Не считайте результат локальных тестов готовым production-релизом.
+
 ```
 Telegram-клиент                    DerenguhGram-Proxy                 Telegram DC
      │                                   │                                 │

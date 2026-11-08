@@ -1,0 +1,9 @@
+# Downloadable delivery archives and checksums are generated, not source.
+/downloads/
+
+# Local secrets, signing material and Python caches.
+.env
+*.keystore
+*.jks
+__pycache__/
+*.py[cod]
