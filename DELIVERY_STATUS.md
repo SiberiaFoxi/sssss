@@ -10,7 +10,7 @@ Draft release `clients-v0.1.0`:
 https://github.com/SiberiaFoxi/sssss/releases/tag/untagged-55aeab518cc76b708b10
 
 CI builds official Telegram sources with the DerenguhGram overlay:
-- Android release APK (afat, signed with upstream demo keystore) — workflow `build-android.yml`.
+- Android release APK (afat, signed with upstream demo keystore) — **built & uploaded** (run 42485580917, `apksigner verify` OK, 93,567,564 bytes).
 - Windows x64 EXE (official tdesktop prepare/configure recipe) — workflow `build-desktop.yml`.
 
 No APK/EXE is claimed until the corresponding workflow succeeds and `apksigner verify` /
