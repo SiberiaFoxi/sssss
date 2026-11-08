@@ -21,9 +21,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
-      - name: Install NDK / CMake
+      - name: Install NDK / CMake (runner preinstalled SDK)
         run: |
+          export ANDROID_HOME=/usr/local/lib/android/sdk
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          yes | sdkmanager --licenses >/dev/null || true
           sdkmanager --install "ndk;27.2.12479018" "cmake;3.22.1" "build-tools;36.0.0" "platforms;android-36"
       - name: Fetch pinned Telegram Android (with submodules)
         run: |
